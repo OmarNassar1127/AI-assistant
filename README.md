@@ -1,4 +1,4 @@
-# OpenAI Assistants API Quickstart
+# AI Assistants API Quickstart
 
 A quick-start template using the OpenAI [Assistants API](https://platform.openai.com/docs/assistants/overview) with [Next.js](https://nextjs.org/docs).
 <br/>
@@ -8,8 +8,8 @@ A quick-start template using the OpenAI [Assistants API](https://platform.openai
 ### 1. Clone repo
 
 ```shell
-git clone https://github.com/openai/openai-assistants-quickstart.git
-cd openai-assistants-quickstart
+git clone https://github.com/OmarNassar1127/AI-assistant
+cd ai-assistant
 ```
 
 ### 2. Set your [OpenAI API key](https://platform.openai.com/api-keys)
