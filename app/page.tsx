@@ -1,30 +1,23 @@
 "use client";
 
-import React, { useContext } from "react";
+import React, { useState } from "react";
+import { useAuth } from "./context/AuthContext";
 import styles from "./page.module.css";
-import { AuthProvider, useAuth } from "./context/AuthContext";
 import Login from "./components/login";
+import Register from "./components/register";
 
 const Home: React.FC = () => {
-  const authContext = useAuth();
-
-  if (!authContext) {
-    return null;
-  }
-
-  const { user } = authContext;
+  const { user } = useAuth();
+  const [showRegister, setShowRegister] = useState(false);
 
   const categories = {
-    // "Basic chat": "basic-chat",
-    // "Function calling": "function-calling",
     "File search": "file-search",
-    // All: "all",
   };
 
-  return (
-    <main className={styles.main}>
-      <div className={styles.title}>Chat with your files</div>
-      {user ? (
+  if (user) {
+    return (
+      <main className={styles.main}>
+        <div className={styles.title}>Chat with your files</div>
         <div className={styles.container}>
           {Object.entries(categories).map(([name, url]) => (
             <a key={name} className={styles.category} href={`/examples/${url}`}>
@@ -32,19 +25,36 @@ const Home: React.FC = () => {
             </a>
           ))}
         </div>
+      </main>
+    );
+  }
+
+  return (
+    <main className={styles.main}>
+      <div className={styles.title}>Chat with your files</div>
+      {showRegister ? (
+        <>
+          <Register />
+          <p className={styles.switchText}>
+            Already have an account?{" "}
+            <a onClick={() => setShowRegister(false)} className={styles.link}>
+              Log in!
+            </a>
+          </p>
+        </>
       ) : (
-        <Login />
+        <>
+          <Login />
+          <p className={styles.switchText}>
+            No account yet?{" "}
+            <a onClick={() => setShowRegister(true)} className={styles.link}>
+              Sign up!
+            </a>
+          </p>
+        </>
       )}
     </main>
   );
 };
 
-const App: React.FC = () => {
-  return (
-    <AuthProvider>
-      <Home />
-    </AuthProvider>
-  );
-};
-
-export default App;
+export default Home;

@@ -1,17 +1,17 @@
-/* components/login.module.css */
-.loginContainer {
+/* Existing styles */
+
+.registerContainer {
   display: flex;
-  flex-direction: column;
   justify-content: center;
   align-items: center;
-  width: 100%;
   height: 40vh;
+  width: 100%;
   background-color: #fff;
   border-radius: 12px;
   padding: 20px;
 }
 
-.loginForm {
+.registerForm {
   display: flex;
   flex-direction: column;
   gap: 20px;
@@ -42,12 +42,15 @@
   cursor: pointer;
 }
 
-.button:disabled {
-  background-color: lightgrey;
-}
-
-.error {
+.errorMessage {
   color: red;
   margin-top: 10px;
   font-size: 0.9em;
+}
+
+.successMessage {
+  color: green;
+  margin-top: 10px;
+  font-size: 0.9em;
+  font-weight: bold;
 }

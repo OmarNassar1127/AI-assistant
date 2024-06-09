@@ -64,7 +64,7 @@ const FileViewer = () => {
       body: data,
     });
 
-    setRefresh((prev) => !prev); // Trigger a refresh after file upload
+    setRefresh((prev) => !prev);
   };
 
   return (

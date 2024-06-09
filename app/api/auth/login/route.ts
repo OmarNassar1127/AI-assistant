@@ -18,6 +18,11 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Invalid username or password" }, { status: 400 });
   }
 
+  // Check if the user is verified
+  if (!user.verified) {
+    return NextResponse.json({ error: "User not verified" }, { status: 403 });
+  }
+
   // Check password
   const validPassword = await bcrypt.compare(password, user.password);
   if (!validPassword) {

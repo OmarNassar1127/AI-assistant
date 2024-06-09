@@ -45,3 +45,15 @@
 .category:hover {
   background-color: #e3e3eb;
 }
+
+.switchText {
+  text-align: center;
+  margin-top: 20px;
+  font-size: 0.9em;
+}
+
+.link {
+  color: blue;
+  cursor: pointer;
+  text-decoration: underline;
+}

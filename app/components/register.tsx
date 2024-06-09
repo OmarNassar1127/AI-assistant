@@ -1,16 +1,17 @@
-import React, { useState } from "react";
-import { useAuth } from "../context/AuthContext";
-import styles from "./login.module.css";
+"use client";
 
-const Login: React.FC = () => {
+import React, { useState } from "react";
+import styles from "./register.module.css";
+
+const Register: React.FC = () => {
   const [username, setUsername] = useState<string>("");
   const [password, setPassword] = useState<string>("");
-  const [error, setError] = useState<string>("");
-  const { login } = useAuth();
+  const [message, setMessage] = useState<string>("");
+  const [isSuccess, setIsSuccess] = useState<boolean>(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const response = await fetch("/api/auth/login", {
+    const response = await fetch("/api/auth/register", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ username, password }),
@@ -18,15 +19,17 @@ const Login: React.FC = () => {
 
     const data = await response.json();
     if (response.ok) {
-      login(data);
+      setMessage("Registration successful! Please log in.");
+      setIsSuccess(true);
     } else {
-      setError(data.error || "Login failed");
+      setMessage(data.error || "Registration failed");
+      setIsSuccess(false);
     }
   };
 
   return (
-    <div className={styles.loginContainer}>
-      <form onSubmit={handleSubmit} className={styles.loginForm}>
+    <div className={styles.registerContainer}>
+      <form onSubmit={handleSubmit} className={styles.registerForm}>
         <input
           type="text"
           placeholder="Username"
@@ -44,12 +47,18 @@ const Login: React.FC = () => {
           className={styles.input}
         />
         <button type="submit" className={styles.button}>
-          Login
+          Register
         </button>
-        {error && <p className={styles.error}>{error}</p>}
+        {message && (
+          <p
+            className={isSuccess ? styles.successMessage : styles.errorMessage}
+          >
+            {message}
+          </p>
+        )}
       </form>
     </div>
   );
 };
 
-export default Login;
+export default Register;
