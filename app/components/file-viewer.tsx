@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import styles from "./file-viewer.module.css";
+import LoadingSpinner from "./loading-spinner";
 
 const TrashIcon = () => (
   <svg
@@ -20,38 +21,50 @@ const TrashIcon = () => (
 
 const FileViewer = () => {
   const [files, setFiles] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [refresh, setRefresh] = useState(false);
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      fetchFiles();
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, []);
+    fetchFiles();
+  }, [refresh]);
 
   const fetchFiles = async () => {
+    setLoading(true);
     const resp = await fetch("/api/assistants/files", {
       method: "GET",
     });
     const data = await resp.json();
     setFiles(data);
+    setLoading(false);
   };
 
   const handleFileDelete = async (fileId) => {
+    setLoading(true);
     await fetch("/api/assistants/files", {
       method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
       body: JSON.stringify({ fileId }),
     });
+
+    setFiles((prevFiles) =>
+      prevFiles.filter((file) => file.file_id !== fileId)
+    );
+    setLoading(false);
   };
 
   const handleFileUpload = async (event) => {
+    setLoading(true);
     const data = new FormData();
-    if (event.target.files.length < 0) return;
+    if (event.target.files.length === 0) return;
     data.append("file", event.target.files[0]);
     await fetch("/api/assistants/files", {
       method: "POST",
       body: data,
     });
+
+    setRefresh((prev) => !prev);
   };
 
   return (
@@ -61,7 +74,9 @@ const FileViewer = () => {
           files.length !== 0 ? styles.grow : ""
         }`}
       >
-        {files.length === 0 ? (
+        {loading ? (
+          <LoadingSpinner />
+        ) : files.length === 0 ? (
           <div className={styles.title}>Attach files to test file search</div>
         ) : (
           files.map((file) => (

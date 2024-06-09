@@ -1,26 +1,58 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
+import { useAuth } from "./context/AuthContext";
 import styles from "./page.module.css";
+import Login from "./components/login";
+import Register from "./components/register";
 
-const Home = () => {
+const Home: React.FC = () => {
+  const { user } = useAuth();
+  const [showRegister, setShowRegister] = useState(false);
+
   const categories = {
-    // "Basic chat": "basic-chat",
-    // "Function calling": "function-calling",
     "File search": "file-search",
-    // All: "all",
   };
+
+  if (user) {
+    return (
+      <main className={styles.main}>
+        <div className={styles.title}>Chat with your files</div>
+        <div className={styles.container}>
+          {Object.entries(categories).map(([name, url]) => (
+            <a key={name} className={styles.category} href={`/examples/${url}`}>
+              {name}
+            </a>
+          ))}
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main className={styles.main}>
       <div className={styles.title}>Chat with your files</div>
-      <div className={styles.container}>
-        {Object.entries(categories).map(([name, url]) => (
-          <a key={name} className={styles.category} href={`/examples/${url}`}>
-            {name}
-          </a>
-        ))}
-      </div>
+      {showRegister ? (
+        <>
+          <Register />
+          <p className={styles.switchText}>
+            Already have an account?{" "}
+            <a onClick={() => setShowRegister(false)} className={styles.link}>
+              Log in!
+            </a>
+          </p>
+        </>
+      ) : (
+        <>
+          <Login />
+          <p className={styles.switchText}>
+            No account yet?{" "}
+            <a onClick={() => setShowRegister(true)} className={styles.link}>
+              Sign up!
+            </a>
+          </p>
+        </>
+      )}
     </main>
   );
 };

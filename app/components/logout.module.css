@@ -1,0 +1,13 @@
+/* components/logout.module.css */
+.logoutButton {
+  padding: 12px 24px;
+  background-color: #000;
+  color: white;
+  border: none;
+  font-size: 1em;
+  border-radius: 12px;
+  cursor: pointer;
+  position: absolute;
+  top: 5vh;
+  right: 13vh;
+}

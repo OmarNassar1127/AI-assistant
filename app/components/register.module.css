@@ -1,0 +1,56 @@
+/* Existing styles */
+
+.registerContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 40vh;
+  width: 100%;
+  background-color: #fff;
+  border-radius: 12px;
+  padding: 20px;
+}
+
+.registerForm {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 300px;
+}
+
+.input {
+  padding: 16px 24px;
+  border-radius: 12px;
+  border: 2px solid #ccc;
+  font-size: 1em;
+  background-color: #efefef;
+}
+
+.input:focus {
+  outline: none;
+  border-color: #000;
+  background-color: white;
+}
+
+.button {
+  padding: 12px 24px;
+  background-color: #000;
+  color: white;
+  border: none;
+  font-size: 1em;
+  border-radius: 12px;
+  cursor: pointer;
+}
+
+.errorMessage {
+  color: red;
+  margin-top: 10px;
+  font-size: 0.9em;
+}
+
+.successMessage {
+  color: green;
+  margin-top: 10px;
+  font-size: 0.9em;
+  font-weight: bold;
+}
