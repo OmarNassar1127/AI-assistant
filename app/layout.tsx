@@ -2,6 +2,9 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import Warnings from "./components/warnings";
 import { assistantId } from "./assistant-config";
+import RootLayout from "./rootLayout";
+import { AuthProvider } from "./context/AuthContext";
+
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
@@ -12,12 +15,16 @@ export const metadata = {
   },
 };
 
-export default function RootLayout({ children }) {
+export default function Layout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
       <body className={inter.className}>
-        {assistantId ? children : <Warnings />}
-        <img className="logo" src="/omar.png" alt="OpenAI Logo" />
+        <AuthProvider>
+          <RootLayout>
+            {assistantId ? children : <Warnings />}
+            <img className="logo" src="/omar.png" alt="OpenAI Logo" />
+          </RootLayout>
+        </AuthProvider>
       </body>
     </html>
   );

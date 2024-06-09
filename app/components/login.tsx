@@ -1,6 +1,6 @@
-// components/Login.tsx
 import React, { useState } from "react";
 import { useAuth } from "../context/AuthContext";
+import styles from "./login.module.css";
 
 const Login: React.FC = () => {
   const [username, setUsername] = useState<string>("");
@@ -24,24 +24,29 @@ const Login: React.FC = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <h2>Login</h2>
-      <input
-        type="text"
-        placeholder="Username"
-        value={username}
-        onChange={(e) => setUsername(e.target.value)}
-        required
-      />
-      <input
-        type="password"
-        placeholder="Password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        required
-      />
-      <button type="submit">Login</button>
-    </form>
+    <div className={styles.loginContainer}>
+      <form onSubmit={handleSubmit} className={styles.loginForm}>
+        <input
+          type="text"
+          placeholder="Username"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+          required
+          className={styles.input}
+        />
+        <input
+          type="password"
+          placeholder="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+          className={styles.input}
+        />
+        <button type="submit" className={styles.button}>
+          Login
+        </button>
+      </form>
+    </div>
   );
 };
 
