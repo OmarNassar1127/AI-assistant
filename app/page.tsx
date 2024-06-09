@@ -1,4 +1,3 @@
-// pages/index.tsx
 "use client";
 
 import React, { useContext } from "react";
