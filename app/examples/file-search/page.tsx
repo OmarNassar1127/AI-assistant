@@ -41,7 +41,7 @@ const FileSearchPage: React.FC = () => {
           <CreateChat onChatCreated={handleChatCreated} />
           <ChatList onSelectChat={handleChatSelect} ref={chatListRef} />
         </div>
-        <div className={styles.content}>
+        <div className={styles.content} style={{ display: "flex" }}>
           {selectedChatId ? (
             <>
               <div className={styles.column}>
