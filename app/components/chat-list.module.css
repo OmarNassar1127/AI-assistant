@@ -1,0 +1,54 @@
+/* components/ChatList.module.css */
+.chatList {
+  padding: 20px;
+  background-color: #f8f8f8;
+  border-right: 1px solid #ddd;
+  height: 100%;
+}
+
+.chatList h2 {
+  margin-bottom: 10px;
+}
+
+.chatList ul {
+  list-style: none;
+  padding: 0;
+}
+
+.chatList li {
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  margin-bottom: 5px;
+  cursor: pointer;
+  background-color: #fff;
+}
+
+.chatList li:hover {
+  background-color: #f0f0f0;
+}
+
+.createChat {
+  margin-top: 20px;
+}
+
+.createChat input {
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  width: 70%;
+  margin-right: 10px;
+}
+
+.createChat button {
+  padding: 8px 12px;
+  border: none;
+  background-color: #0070f3;
+  color: white;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.createChat button:hover {
+  background-color: #005bb5;
+}

@@ -52,12 +52,14 @@ const Message = ({ role, text }: MessageProps) => {
 };
 
 type ChatProps = {
+  chatId: number;
   functionCallHandler?: (
     toolCall: RequiredActionFunctionToolCall
   ) => Promise<string>;
 };
 
 const Chat = ({
+  chatId,
   functionCallHandler = () => Promise.resolve(""), // default to return empty string
 }: ChatProps) => {
   const [userInput, setUserInput] = useState("");

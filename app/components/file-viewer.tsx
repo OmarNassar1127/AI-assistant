@@ -19,18 +19,18 @@ const TrashIcon = () => (
   </svg>
 );
 
-const FileViewer = () => {
+const FileViewer = ({ chatId }) => {
   const [files, setFiles] = useState([]);
   const [loading, setLoading] = useState(false);
   const [refresh, setRefresh] = useState(false);
 
   useEffect(() => {
     fetchFiles();
-  }, [refresh]);
+  }, [refresh, chatId]);
 
   const fetchFiles = async () => {
     setLoading(true);
-    const resp = await fetch("/api/assistants/files", {
+    const resp = await fetch(`/api/assistants/files?chatId=${chatId}`, {
       method: "GET",
     });
     const data = await resp.json();
@@ -40,12 +40,12 @@ const FileViewer = () => {
 
   const handleFileDelete = async (fileId) => {
     setLoading(true);
-    await fetch("/api/assistants/files", {
+    await fetch(`/api/assistants/files`, {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ fileId }),
+      body: JSON.stringify({ fileId, chatId }),
     });
 
     setFiles((prevFiles) =>
@@ -59,7 +59,8 @@ const FileViewer = () => {
     const data = new FormData();
     if (event.target.files.length === 0) return;
     data.append("file", event.target.files[0]);
-    await fetch("/api/assistants/files", {
+    data.append("chatId", chatId);
+    await fetch(`/api/assistants/files`, {
       method: "POST",
       body: data,
     });
