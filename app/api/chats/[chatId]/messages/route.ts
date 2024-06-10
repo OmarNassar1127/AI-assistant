@@ -1,8 +1,8 @@
 // app/api/chats/[chatId]/messages/route.ts
 
-import { NextRequest, NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
-import auth from "@/app/api/middleware/auth";
+import { NextRequest, NextResponse } from 'next/server';
+import { PrismaClient } from '@prisma/client';
+import auth from '@/app/api/middleware/auth';
 
 const prisma = new PrismaClient();
 
@@ -17,7 +17,7 @@ export async function GET(request: NextRequest, { params }) {
   const chatId = parseInt(params.chatId, 10);
 
   if (!user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
   const messages = await prisma.message.findMany({
@@ -40,7 +40,7 @@ export async function POST(request: NextRequest, { params }) {
   const { question, answer } = await request.json();
 
   if (!user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
   const message = await prisma.message.create({
