@@ -96,28 +96,31 @@ const Chat = ({
   // fetch messages when chatId changes
   useEffect(() => {
     const fetchMessages = async () => {
-      if (!user?.token) {
-        console.error("No token found");
+      if (!user?.token || !chatId) {
+        console.error("No token or chatId found");
         return;
       }
-  
-      const response = await fetch(`/api/chats/${chatId}/messages`, {
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
-      });
-  
-      if (response.ok) {
-        const data = await response.json();
-        setMessages(Array.isArray(data) ? data : []);
-      } else {
-        console.error("Failed to fetch messages:", response.statusText);
+
+      try {
+        const response = await fetch(`/api/chats/${chatId}/messages`, {
+          headers: {
+            Authorization: `Bearer ${user.token}`,
+          },
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          setMessages(data); // Update messages state with fetched data
+        } else {
+          console.error("Failed to fetch messages:", response.statusText);
+        }
+      } catch (error) {
+        console.error("Error fetching messages:", error);
       }
     };
-  
+
     fetchMessages();
-  }, [chatId, user]);  
-  
+  }, [chatId, user]);
 
   const saveMessage = async (question, answer) => {
     try {
@@ -177,7 +180,7 @@ const Chat = ({
         }
       );
       const stream = AssistantStream.fromReadableStream(response.body);
-      handleReadableStream(stream);
+      handleReadableStream(stream, userInput);
     } catch (error) {}
   };
 
@@ -192,13 +195,13 @@ const Chat = ({
     setUserInput(""); // Clear input field
     setInputDisabled(true);
     scrollToBottom();
-  };  
+  };
 
   /* Stream Event Handlers */
 
   // textCreated - create new assistant message
   const handleTextCreated = () => {
-    appendMessage("assistant", "");
+    appendMessage("assistant", ""); // Append the assistant's message
   };
 
   // textDelta - append text to last assistant message
@@ -246,30 +249,30 @@ const Chat = ({
     setInputDisabled(true);
     submitActionResult(runId, toolCallOutputs);
     saveMessage(question, toolCallOutputs[0]?.output); // Save message to the database
-  };  
+  };
 
   // handleRunCompleted - re-enable the input form
   const handleRunCompleted = () => {
     setInputDisabled(false);
   };
 
-  const handleReadableStream = (stream: AssistantStream, question: string) => {
+  const handleReadableStream = (stream, question) => {
     let assistantResponse = ""; // Initialize assistant response
-  
+
     // messages
     stream.on("textCreated", handleTextCreated);
     stream.on("textDelta", (delta) => {
       handleTextDelta(delta);
       assistantResponse += delta.value || ""; // Append text delta to the response
     });
-  
+
     // image
     stream.on("imageFileDone", handleImageFileDone);
-  
+
     // code interpreter
     stream.on("toolCallCreated", toolCallCreated);
     stream.on("toolCallDelta", toolCallDelta);
-  
+
     // events without helpers yet (e.g. requires_action and run.done)
     stream.on("event", (event) => {
       if (event.event === "thread.run.requires_action")
@@ -279,7 +282,7 @@ const Chat = ({
         saveMessage(question, assistantResponse); // Save message to the database
       }
     });
-  };  
+  };
 
   /*
     =======================
@@ -324,7 +327,11 @@ const Chat = ({
     <div className={styles.chatContainer}>
       <div className={styles.messages}>
         {messages.map((msg, index) => (
-          <Message key={index} role={msg.role} text={msg.text} />
+          <React.Fragment key={index}>
+            {msg.question && <Message role="user" text={msg.question} />}
+            {msg.answer && <Message role="assistant" text={msg.answer} />}
+            <Message key={index} role={msg.role} text={msg.text} />
+          </React.Fragment>
         ))}
         <div ref={messagesEndRef} />
       </div>
