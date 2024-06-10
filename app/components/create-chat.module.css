@@ -40,7 +40,7 @@
 }
 
 .createChat button:hover {
-  background-color: #fff;
+  background-color: #f0f0f0;
   color: #000;
   border: 1px solid #ccc;
 }

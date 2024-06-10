@@ -28,31 +28,6 @@
 }
 
 .chatList li.activeChat {
-  background-color: #0070f3;
+  background-color: #000;
   color: white;
-}
-
-.createChat {
-  margin-top: 20px;
-}
-
-.createChat input {
-  padding: 8px;
-  border: 1px solid #ddd;
-  border-radius: 5px;
-  width: 70%;
-  margin-right: 10px;
-}
-
-.createChat button {
-  padding: 8px 12px;
-  border: none;
-  background-color: #0070f3;
-  color: white;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-.createChat button:hover {
-  background-color: #005bb5;
 }
