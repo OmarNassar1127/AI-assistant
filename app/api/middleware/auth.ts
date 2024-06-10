@@ -1,20 +1,21 @@
 // app/api/middleware/auth.ts
+import { NextRequest, NextResponse } from 'next/server';
 import jwt from 'jsonwebtoken';
 
-const JWT_SECRET = process.env.JWT_SECRET;
+const JWT_SECRET = process.env.JWT_SECRET!;
 
-export default function auth(req, res, next) {
-    const token = req.headers['authorization']?.split(' ')[1]; // Extract the token from Bearer token
-    
-    if (!token) {
-        return res.status(401).json({ error: 'Access denied' });
-    }
-    
-    try {
-        const verified = jwt.verify(token, JWT_SECRET);
-        req.user = verified;
-        next();
-    } catch (error) {
-        res.status(400).json({ error: 'Invalid token' });
-    }
+export default function auth(req: NextRequest) {
+  const token = req.headers.get('authorization')?.split(' ')[1];
+
+  if (!token) {
+    return NextResponse.json({ error: 'Access denied' }, { status: 401 });
+  }
+
+  try {
+    const verified = jwt.verify(token, JWT_SECRET);
+    (req as any).user = verified; // TypeScript workaround for custom properties
+    return NextResponse.next(); // Proceed with the next middleware or the main handler
+  } catch (error) {
+    return NextResponse.json({ error: 'Invalid token' }, { status: 400 });
+  }
 }

@@ -86,9 +86,7 @@ const Chat = ({
         });
         const data = await res.json();
         setThreadId(data.threadId);
-      } catch (error) {
-        console.error("Error creating thread:", error);
-      }
+      } catch (error) {}
     };
     createThread();
   }, []);
@@ -108,7 +106,6 @@ const Chat = ({
       const stream = AssistantStream.fromReadableStream(response.body);
       handleReadableStream(stream);
     } catch (error) {
-      console.error("Error sending message:", error);
     } finally {
       setLoading(false); // Stop loading
     }
@@ -131,9 +128,7 @@ const Chat = ({
       );
       const stream = AssistantStream.fromReadableStream(response.body);
       handleReadableStream(stream);
-    } catch (error) {
-      console.error("Error submitting action result:", error);
-    }
+    } catch (error) {}
   };
 
   const handleSubmit = (e) => {

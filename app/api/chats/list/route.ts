@@ -1,22 +1,24 @@
 // app/api/chats/list/route.ts
-import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/app/api/auth/[...nextauth]/authOptions";
+import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
+import auth from "@/app/api/middleware/auth";
 
 const prisma = new PrismaClient();
 
-export async function GET(request: Request) {
-  const session = await getServerSession({ req: request, ...authOptions });
+export async function GET(request: NextRequest) {
+  const response = auth(request);
 
-  console.log("Session:", session); // Debug: Log the session object
+  if (response.status !== 200) {
+    return response;
+  }
 
-  if (!session) {
-    return NextResponse.json({ error: "hello nigga" }, { status: 401 });
+  const user = (request as any).user;
+  if (!user) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   const chats = await prisma.chat.findMany({
-    where: { userId: parseInt(session.user.id, 10) }, // Ensure userId is an integer
+    where: { userId: parseInt(user.userId, 10) }, // Ensure userId is an integer
     include: {
       messages: true,
     },

@@ -1,31 +1,41 @@
 // components/ChatList.tsx
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback, forwardRef, useImperativeHandle } from "react";
+import { useAuth } from "../context/AuthContext";
 import styles from "./chat-list.module.css";
 
-const ChatList: React.FC<{ onSelectChat: (chatId: number) => void }> = ({
-  onSelectChat,
-}) => {
+interface ChatListProps {
+  onSelectChat: (chatId: number) => void;
+}
+
+const ChatList = forwardRef<unknown, ChatListProps>(({ onSelectChat }, ref) => {
   const [chats, setChats] = useState<any[]>([]);
+  const { user } = useAuth();
+
+  const fetchChats = useCallback(async () => {
+    if (!user?.token) {
+      return;
+    }
+
+    const response = await fetch("/api/chats/list", {
+      headers: {
+        Authorization: `Bearer ${user.token}`,
+      },
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      setChats(Array.isArray(data) ? data : []);
+    } else {
+    }
+  }, [user]);
+
+  useImperativeHandle(ref, () => ({
+    fetchChats,
+  }));
 
   useEffect(() => {
-    const fetchChats = async () => {
-      const token = localStorage.getItem("token");
-      const response = await fetch("/api/chats/list", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      console.log(response.headers);
-      if (response.ok) {
-        const data = await response.json();
-        setChats(Array.isArray(data) ? data : []);
-      } else {
-        console.error("Failed to fetch chats:", response.statusText);
-      }
-    };
-
     fetchChats();
-  }, []);
+  }, [user, fetchChats]);
 
   return (
     <div className={styles.chatList}>
@@ -39,6 +49,6 @@ const ChatList: React.FC<{ onSelectChat: (chatId: number) => void }> = ({
       </ul>
     </div>
   );
-};
+});
 
 export default ChatList;

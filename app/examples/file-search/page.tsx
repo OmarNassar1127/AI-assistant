@@ -1,7 +1,6 @@
-// examples/file-search/page.tsx
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { useAuth } from "../../context/AuthContext";
 import styles from "../shared/page.module.css";
 import Chat from "../../components/chat";
@@ -13,13 +12,16 @@ import CreateChat from "../../components/create-chat";
 const FileSearchPage: React.FC = () => {
   const { user } = useAuth();
   const [selectedChatId, setSelectedChatId] = useState<number | null>(null);
+  const chatListRef = useRef<{ fetchChats: () => void }>(null);
 
   const handleChatSelect = (chatId: number) => {
     setSelectedChatId(chatId);
   };
 
   const handleChatCreated = () => {
-    // Optionally, refresh the chat list or perform other actions after a chat is created
+    if (chatListRef.current) {
+      chatListRef.current.fetchChats();
+    }
   };
 
   if (!user) {
@@ -37,7 +39,7 @@ const FileSearchPage: React.FC = () => {
       <div className={styles.container}>
         <div className={styles.sidebar}>
           <CreateChat onChatCreated={handleChatCreated} />
-          <ChatList onSelectChat={handleChatSelect} />
+          <ChatList onSelectChat={handleChatSelect} ref={chatListRef} />
         </div>
         <div className={styles.content}>
           {selectedChatId ? (
@@ -52,7 +54,7 @@ const FileSearchPage: React.FC = () => {
               </div>
             </>
           ) : (
-            <div className={styles.placeholder}>Select a chat to start</div>
+            <div></div>
           )}
         </div>
       </div>

@@ -10,6 +10,10 @@ const CreateChat: React.FC<{ onChatCreated: () => void }> = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const token = localStorage.getItem("token");
+    if (!token) {
+      return;
+    }
+
     const response = await fetch("/api/chats/create", {
       method: "POST",
       headers: {
@@ -20,10 +24,9 @@ const CreateChat: React.FC<{ onChatCreated: () => void }> = ({
     });
 
     if (response.ok) {
-      onChatCreated();
+      onChatCreated(); // Trigger the chat list refresh
       setName("");
     } else {
-      console.error("Failed to create chat:", response.statusText);
     }
   };
 

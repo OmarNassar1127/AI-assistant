@@ -1,3 +1,4 @@
+// components/Login.tsx
 import React, { useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import styles from "./login.module.css";
@@ -18,7 +19,7 @@ const Login: React.FC = () => {
 
     const data = await response.json();
     if (response.ok) {
-      login(data);
+      login({ token: data.token }); // Save token to AuthContext
     } else {
       setError(data.error || "Login failed");
     }
