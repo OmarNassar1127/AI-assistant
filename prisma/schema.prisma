@@ -31,9 +31,11 @@ model Chat {
 
 model Message {
   id        Int      @id @default(autoincrement())
-  content   String
-  role      String
+  question  String
+  answer    String
   chat      Chat     @relation(fields: [chatId], references: [id])
   chatId    Int
-  createdAt DateTime @default(now())
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
 }
