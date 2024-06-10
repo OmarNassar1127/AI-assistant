@@ -1,4 +1,3 @@
-/* components/ChatList.module.css */
 .chatList {
   padding: 20px;
   background-color: #f8f8f8;
@@ -26,6 +25,11 @@
 
 .chatList li:hover {
   background-color: #f0f0f0;
+}
+
+.chatList li.activeChat {
+  background-color: #0070f3;
+  color: white;
 }
 
 .createChat {
