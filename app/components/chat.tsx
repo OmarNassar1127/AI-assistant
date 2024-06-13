@@ -1,13 +1,12 @@
 "use client";
-
 import React, { useState, useEffect, useRef } from "react";
 import styles from "./chat.module.css";
-import { AssistantStream } from "openai/lib/AssistantStream";
 import Markdown from "react-markdown";
+import { useAuth } from "../context/AuthContext";
+import { AssistantStream } from "openai/lib/AssistantStream";
 // @ts-expect-error - no types for this yet
 import { AssistantStreamEvent } from "openai/resources/beta/assistants/assistants";
 import { RequiredActionFunctionToolCall } from "openai/resources/beta/threads/runs/runs";
-import { useAuth } from "../context/AuthContext";
 
 type MessageProps = {
   role: "user" | "assistant" | "code";
@@ -61,39 +60,37 @@ type ChatProps = {
 
 const Chat = ({
   chatId,
-  functionCallHandler = () => Promise.resolve(""), // default to return empty string
+  functionCallHandler = () => Promise.resolve(""),
 }: ChatProps) => {
-  const { user } = useAuth(); // Use the auth context
+  const { user } = useAuth();
   const [userInput, setUserInput] = useState("");
-  const [messages, setMessages] = useState([]);
+  const [messages, setMessages] = useState<any[]>([]);
   const [inputDisabled, setInputDisabled] = useState(false);
   const [threadId, setThreadId] = useState("");
-  const [loading, setLoading] = useState(false); // Added loading state
+  const [loading, setLoading] = useState(false);
 
-  // automatically scroll to bottom of chat
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
+
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
 
-  // create a new threadID when chat component created
   useEffect(() => {
     const createThread = async () => {
       try {
-        const res = await fetch(`/api/assistants/threads`, {
-          method: "POST",
-        });
+        const res = await fetch(`/api/assistants/threads`, { method: "POST" });
         const data = await res.json();
         setThreadId(data.threadId);
-      } catch (error) {}
+      } catch (error) {
+        console.error("Error creating thread:", error);
+      }
     };
     createThread();
   }, []);
 
-  // fetch messages when chatId changes
   useEffect(() => {
     const fetchMessages = async () => {
       if (!user?.token || !chatId) {
@@ -110,7 +107,7 @@ const Chat = ({
 
         if (response.ok) {
           const data = await response.json();
-          setMessages(data); // Update messages state with fetched data
+          setMessages(data);
         } else {
           console.error("Failed to fetch messages:", response.statusText);
         }
@@ -122,7 +119,7 @@ const Chat = ({
     fetchMessages();
   }, [chatId, user]);
 
-  const saveMessage = async (question, answer) => {
+  const saveMessage = async (question: string, answer: string) => {
     try {
       const response = await fetch(`/api/chats/${chatId}/messages`, {
         method: "POST",
@@ -130,10 +127,7 @@ const Chat = ({
           "Content-Type": "application/json",
           Authorization: `Bearer ${user.token}`,
         },
-        body: JSON.stringify({
-          question,
-          answer,
-        }),
+        body: JSON.stringify({ question, answer }),
       });
 
       if (!response.ok) {
@@ -144,47 +138,75 @@ const Chat = ({
     }
   };
 
-  const sendMessage = async (text) => {
+  const fetchFullChatHistory = async () => {
     try {
-      setLoading(true); // Start loading
-      const response = await fetch(
-        `/api/assistants/threads/${threadId}/messages`,
-        {
-          method: "POST",
-          body: JSON.stringify({
-            content: text,
-          }),
-        }
-      );
-      const stream = AssistantStream.fromReadableStream(response.body);
-      handleReadableStream(stream, text); // Pass text to handleReadableStream
+      const response = await fetch(`/api/chats/${chatId}/messages`, {
+        headers: {
+          Authorization: `Bearer ${user.token}`,
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        return data;
+      } else {
+        console.error("Failed to fetch messages:", response.statusText);
+        return [];
+      }
     } catch (error) {
-    } finally {
-      setLoading(false); // Stop loading
+      console.error("Error fetching messages:", error);
+      return [];
     }
   };
 
-  const submitActionResult = async (runId, toolCallOutputs) => {
+  const sendMessage = async (text: string) => {
     try {
+      setLoading(true);
+      const fullMessages = await fetchFullChatHistory();
+      const context = fullMessages
+        .map((msg: any) => `User: ${msg.question}\nAssistant: ${msg.answer}`)
+        .join("\n");
+      const finalContext = `${context}\nUser: ${text}`;
       const response = await fetch(
-        `/api/assistants/threads/${threadId}/actions`,
+        `/api/assistants/threads/${threadId}/messages`,
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            runId: runId,
-            toolCallOutputs: toolCallOutputs,
+            content: finalContext,
           }),
+        }
+      );
+
+      const stream = AssistantStream.fromReadableStream(response.body);
+      handleReadableStream(stream, text);
+    } catch (error) {
+      console.error("Error sending message:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const submitActionResult = async (runId: string, toolCallOutputs: any[]) => {
+    try {
+      const response = await fetch(
+        `/api/assistants/threads/${threadId}/actions`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ runId, toolCallOutputs }),
         }
       );
       const stream = AssistantStream.fromReadableStream(response.body);
       handleReadableStream(stream, userInput);
-    } catch (error) {}
+    } catch (error) {
+      console.error("Error submitting action result:", error);
+    }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!userInput.trim()) return;
     setMessages((prevMessages) => [
@@ -192,20 +214,18 @@ const Chat = ({
       { role: "user", text: userInput },
     ]);
     sendMessage(userInput);
-    setUserInput(""); // Clear input field
+    setUserInput("");
     setInputDisabled(true);
     scrollToBottom();
   };
 
   /* Stream Event Handlers */
 
-  // textCreated - create new assistant message
   const handleTextCreated = () => {
-    appendMessage("assistant", ""); // Append the assistant's message
+    appendMessage("assistant", "");
   };
 
-  // textDelta - append text to last assistant message
-  const handleTextDelta = (delta) => {
+  const handleTextDelta = (delta: any) => {
     if (delta.value != null) {
       appendToLastMessage(delta.value);
     }
@@ -214,32 +234,27 @@ const Chat = ({
     }
   };
 
-  // imageFileDone - show image in chat
-  const handleImageFileDone = (image) => {
+  const handleImageFileDone = (image: any) => {
     appendToLastMessage(`\n![${image.file_id}](/api/files/${image.file_id})\n`);
   };
 
-  // toolCallCreated - log new tool call
-  const toolCallCreated = (toolCall) => {
+  const toolCallCreated = (toolCall: any) => {
     if (toolCall.type != "code_interpreter") return;
     appendMessage("code", "");
   };
 
-  // toolCallDelta - log delta and snapshot for the tool call
-  const toolCallDelta = (delta, snapshot) => {
+  const toolCallDelta = (delta: any, snapshot: any) => {
     if (delta.type != "code_interpreter") return;
     if (!delta.code_interpreter.input) return;
     appendToLastMessage(delta.code_interpreter.input);
   };
 
-  // handleRequiresAction - handle function call
   const handleRequiresAction = async (
     event: AssistantStreamEvent.ThreadRunRequiresAction,
     question: string
   ) => {
     const runId = event.data.id;
     const toolCalls = event.data.required_action.submit_tool_outputs.tool_calls;
-    // loop over tool calls and call function handler
     const toolCallOutputs = await Promise.all(
       toolCalls.map(async (toolCall) => {
         const result = await functionCallHandler(toolCall);
@@ -248,49 +263,37 @@ const Chat = ({
     );
     setInputDisabled(true);
     submitActionResult(runId, toolCallOutputs);
-    saveMessage(question, toolCallOutputs[0]?.output); // Save message to the database
+    saveMessage(question, toolCallOutputs[0]?.output);
   };
 
-  // handleRunCompleted - re-enable the input form
   const handleRunCompleted = () => {
     setInputDisabled(false);
   };
 
-  const handleReadableStream = (stream, question) => {
-    let assistantResponse = ""; // Initialize assistant response
+  const handleReadableStream = (stream: AssistantStream, question: string) => {
+    let assistantResponse = "";
 
-    // messages
     stream.on("textCreated", handleTextCreated);
-    stream.on("textDelta", (delta) => {
+    stream.on("textDelta", (delta: any) => {
       handleTextDelta(delta);
-      assistantResponse += delta.value || ""; // Append text delta to the response
+      assistantResponse += delta.value || "";
     });
 
-    // image
     stream.on("imageFileDone", handleImageFileDone);
-
-    // code interpreter
     stream.on("toolCallCreated", toolCallCreated);
     stream.on("toolCallDelta", toolCallDelta);
 
-    // events without helpers yet (e.g. requires_action and run.done)
-    stream.on("event", (event) => {
+    stream.on("event", (event: any) => {
       if (event.event === "thread.run.requires_action")
         handleRequiresAction(event, question);
       if (event.event === "thread.run.completed") {
         handleRunCompleted();
-        saveMessage(question, assistantResponse); // Save message to the database
+        saveMessage(question, assistantResponse);
       }
     });
   };
 
-  /*
-    =======================
-    === Utility Helpers ===
-    =======================
-  */
-
-  const appendToLastMessage = (text) => {
+  const appendToLastMessage = (text: string) => {
     setMessages((prevMessages) => {
       const lastMessage = prevMessages[prevMessages.length - 1];
       const updatedLastMessage = {
@@ -301,17 +304,15 @@ const Chat = ({
     });
   };
 
-  const appendMessage = (role, text) => {
+  const appendMessage = (role: string, text: string) => {
     setMessages((prevMessages) => [...prevMessages, { role, text }]);
   };
 
-  const annotateLastMessage = (annotations) => {
+  const annotateLastMessage = (annotations: any) => {
     setMessages((prevMessages) => {
       const lastMessage = prevMessages[prevMessages.length - 1];
-      const updatedLastMessage = {
-        ...lastMessage,
-      };
-      annotations.forEach((annotation) => {
+      const updatedLastMessage = { ...lastMessage };
+      annotations.forEach((annotation: any) => {
         if (annotation.type === "file_path") {
           updatedLastMessage.text = updatedLastMessage.text.replaceAll(
             annotation.text,
@@ -349,7 +350,7 @@ const Chat = ({
         <button
           type="submit"
           className={styles.button}
-          disabled={inputDisabled || loading} 
+          disabled={inputDisabled || loading}
         >
           Send
         </button>
