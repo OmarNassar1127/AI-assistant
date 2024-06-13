@@ -166,7 +166,8 @@ const Chat = ({
       const context = fullMessages
         .map((msg: any) => `User: ${msg.question}\nAssistant: ${msg.answer}`)
         .join("\n");
-      const finalContext = context + `\nUser: ${text}`;
+      const finalContext = `${context}\nUser: ${text}`;
+      console.log(finalContext);
       const response = await fetch(
         `/api/assistants/threads/${threadId}/messages`,
         {
@@ -175,7 +176,7 @@ const Chat = ({
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            content: text + finalContext,
+            content: finalContext,
           }),
         }
       );
