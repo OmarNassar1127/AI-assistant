@@ -349,7 +349,7 @@ const Chat = ({
         <button
           type="submit"
           className={styles.button}
-          disabled={inputDisabled || loading} // Disable button when loading
+          disabled={inputDisabled || loading} 
         >
           Send
         </button>
