@@ -73,6 +73,7 @@ const Chat = ({
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
+
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
@@ -137,19 +138,48 @@ const Chat = ({
     }
   };
 
+  const fetchFullChatHistory = async () => {
+    try {
+      const response = await fetch(`/api/chats/${chatId}/messages`, {
+        headers: {
+          Authorization: `Bearer ${user.token}`,
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        return data;
+      } else {
+        console.error("Failed to fetch messages:", response.statusText);
+        return [];
+      }
+    } catch (error) {
+      console.error("Error fetching messages:", error);
+      return [];
+    }
+  };
+
   const sendMessage = async (text: string) => {
     try {
       setLoading(true);
+      const fullMessages = await fetchFullChatHistory();
+      const context = fullMessages
+        .map((msg: any) => `User: ${msg.question}\nAssistant: ${msg.answer}`)
+        .join("\n");
+      const finalContext = context + `\nUser: ${text}`;
       const response = await fetch(
         `/api/assistants/threads/${threadId}/messages`,
         {
           method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
           body: JSON.stringify({
-            content: text,
-            context: messages.map((msg) => msg.text).join("\n"), // Include entire chat history
+            content: text + finalContext,
           }),
         }
       );
+
       const stream = AssistantStream.fromReadableStream(response.body);
       handleReadableStream(stream, text);
     } catch (error) {
