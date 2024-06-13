@@ -167,7 +167,6 @@ const Chat = ({
         .map((msg: any) => `User: ${msg.question}\nAssistant: ${msg.answer}`)
         .join("\n");
       const finalContext = `${context}\nUser: ${text}`;
-      console.log(finalContext);
       const response = await fetch(
         `/api/assistants/threads/${threadId}/messages`,
         {
