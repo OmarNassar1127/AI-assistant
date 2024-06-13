@@ -7,6 +7,7 @@ import Markdown from "react-markdown";
 // @ts-expect-error - no types for this yet
 import { AssistantStreamEvent } from "openai/resources/beta/assistants/assistants";
 import { RequiredActionFunctionToolCall } from "openai/resources/beta/threads/runs/runs";
+import { useAuth } from "../context/AuthContext";
 
 type MessageProps = {
   role: "user" | "assistant" | "code";
@@ -52,14 +53,17 @@ const Message = ({ role, text }: MessageProps) => {
 };
 
 type ChatProps = {
+  chatId: number;
   functionCallHandler?: (
     toolCall: RequiredActionFunctionToolCall
   ) => Promise<string>;
 };
 
 const Chat = ({
+  chatId,
   functionCallHandler = () => Promise.resolve(""), // default to return empty string
 }: ChatProps) => {
+  const { user } = useAuth(); // Use the auth context
   const [userInput, setUserInput] = useState("");
   const [messages, setMessages] = useState([]);
   const [inputDisabled, setInputDisabled] = useState(false);
@@ -84,12 +88,61 @@ const Chat = ({
         });
         const data = await res.json();
         setThreadId(data.threadId);
-      } catch (error) {
-        console.error("Error creating thread:", error);
-      }
+      } catch (error) {}
     };
     createThread();
   }, []);
+
+  // fetch messages when chatId changes
+  useEffect(() => {
+    const fetchMessages = async () => {
+      if (!user?.token || !chatId) {
+        console.error("No token or chatId found");
+        return;
+      }
+
+      try {
+        const response = await fetch(`/api/chats/${chatId}/messages`, {
+          headers: {
+            Authorization: `Bearer ${user.token}`,
+          },
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          setMessages(data); // Update messages state with fetched data
+        } else {
+          console.error("Failed to fetch messages:", response.statusText);
+        }
+      } catch (error) {
+        console.error("Error fetching messages:", error);
+      }
+    };
+
+    fetchMessages();
+  }, [chatId, user]);
+
+  const saveMessage = async (question, answer) => {
+    try {
+      const response = await fetch(`/api/chats/${chatId}/messages`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${user.token}`,
+        },
+        body: JSON.stringify({
+          question,
+          answer,
+        }),
+      });
+
+      if (!response.ok) {
+        console.error("Failed to save message:", response.statusText);
+      }
+    } catch (error) {
+      console.error("Error saving message:", error);
+    }
+  };
 
   const sendMessage = async (text) => {
     try {
@@ -104,9 +157,8 @@ const Chat = ({
         }
       );
       const stream = AssistantStream.fromReadableStream(response.body);
-      handleReadableStream(stream);
+      handleReadableStream(stream, text); // Pass text to handleReadableStream
     } catch (error) {
-      console.error("Error sending message:", error);
     } finally {
       setLoading(false); // Stop loading
     }
@@ -128,21 +180,19 @@ const Chat = ({
         }
       );
       const stream = AssistantStream.fromReadableStream(response.body);
-      handleReadableStream(stream);
-    } catch (error) {
-      console.error("Error submitting action result:", error);
-    }
+      handleReadableStream(stream, userInput);
+    } catch (error) {}
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!userInput.trim()) return;
-    sendMessage(userInput);
     setMessages((prevMessages) => [
       ...prevMessages,
       { role: "user", text: userInput },
     ]);
-    setUserInput("");
+    sendMessage(userInput);
+    setUserInput(""); // Clear input field
     setInputDisabled(true);
     scrollToBottom();
   };
@@ -151,7 +201,7 @@ const Chat = ({
 
   // textCreated - create new assistant message
   const handleTextCreated = () => {
-    appendMessage("assistant", "");
+    appendMessage("assistant", ""); // Append the assistant's message
   };
 
   // textDelta - append text to last assistant message
@@ -184,7 +234,8 @@ const Chat = ({
 
   // handleRequiresAction - handle function call
   const handleRequiresAction = async (
-    event: AssistantStreamEvent.ThreadRunRequiresAction
+    event: AssistantStreamEvent.ThreadRunRequiresAction,
+    question: string
   ) => {
     const runId = event.data.id;
     const toolCalls = event.data.required_action.submit_tool_outputs.tool_calls;
@@ -197,6 +248,7 @@ const Chat = ({
     );
     setInputDisabled(true);
     submitActionResult(runId, toolCallOutputs);
+    saveMessage(question, toolCallOutputs[0]?.output); // Save message to the database
   };
 
   // handleRunCompleted - re-enable the input form
@@ -204,10 +256,15 @@ const Chat = ({
     setInputDisabled(false);
   };
 
-  const handleReadableStream = (stream: AssistantStream) => {
+  const handleReadableStream = (stream, question) => {
+    let assistantResponse = ""; // Initialize assistant response
+
     // messages
     stream.on("textCreated", handleTextCreated);
-    stream.on("textDelta", handleTextDelta);
+    stream.on("textDelta", (delta) => {
+      handleTextDelta(delta);
+      assistantResponse += delta.value || ""; // Append text delta to the response
+    });
 
     // image
     stream.on("imageFileDone", handleImageFileDone);
@@ -219,8 +276,11 @@ const Chat = ({
     // events without helpers yet (e.g. requires_action and run.done)
     stream.on("event", (event) => {
       if (event.event === "thread.run.requires_action")
-        handleRequiresAction(event);
-      if (event.event === "thread.run.completed") handleRunCompleted();
+        handleRequiresAction(event, question);
+      if (event.event === "thread.run.completed") {
+        handleRunCompleted();
+        saveMessage(question, assistantResponse); // Save message to the database
+      }
     });
   };
 
@@ -267,7 +327,11 @@ const Chat = ({
     <div className={styles.chatContainer}>
       <div className={styles.messages}>
         {messages.map((msg, index) => (
-          <Message key={index} role={msg.role} text={msg.text} />
+          <React.Fragment key={index}>
+            {msg.question && <Message role="user" text={msg.question} />}
+            {msg.answer && <Message role="assistant" text={msg.answer} />}
+            <Message key={index} role={msg.role} text={msg.text} />
+          </React.Fragment>
         ))}
         <div ref={messagesEndRef} />
       </div>
@@ -285,7 +349,7 @@ const Chat = ({
         <button
           type="submit"
           className={styles.button}
-          disabled={inputDisabled || loading} // Disable button when loading
+          disabled={inputDisabled || loading} 
         >
           Send
         </button>

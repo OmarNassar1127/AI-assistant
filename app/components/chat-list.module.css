@@ -1,0 +1,33 @@
+.chatList {
+  padding: 20px;
+  background-color: #f8f8f8;
+  border-right: 1px solid #ddd;
+  height: 50%;
+}
+
+.chatList h2 {
+  margin-bottom: 10px;
+}
+
+.chatList ul {
+  list-style: none;
+  padding: 0;
+}
+
+.chatList li {
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  margin-bottom: 5px;
+  cursor: pointer;
+  background-color: #fff;
+}
+
+.chatList li:hover {
+  background-color: #f0f0f0;
+}
+
+.chatList li.activeChat {
+  background-color: #000;
+  color: white;
+}

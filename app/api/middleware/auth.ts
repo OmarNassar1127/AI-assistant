@@ -1,19 +1,20 @@
+import { NextRequest, NextResponse } from 'next/server';
 import jwt from 'jsonwebtoken';
 
-const JWT_SECRET = process.env.JWT_SECRET;
+const JWT_SECRET = process.env.JWT_SECRET!;
 
-export default function auth(req, res, next) {
-    const token = req.headers['authorization'];
-    
-    if (!token) {
-        return res.status(401).json({ error: 'Access denied' });
-    }
-    
-    try {
-        const verified = jwt.verify(token, JWT_SECRET);
-        req.user = verified;
-        next();
-    } catch (error) {
-        res.status(400).json({ error: 'Invalid token' });
-    }
+export default function auth(request: NextRequest) {
+  const token = request.headers.get('authorization')?.split(' ')[1];
+
+  if (!token) {
+    return NextResponse.json({ error: 'Access denied' }, { status: 401 });
+  }
+
+  try {
+    const verified = jwt.verify(token, JWT_SECRET);
+    (request as any).user = verified;
+    return NextResponse.next();
+  } catch (error) {
+    return NextResponse.json({ error: 'Invalid token' }, { status: 400 });
+  }
 }
