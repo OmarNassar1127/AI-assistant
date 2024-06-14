@@ -9,7 +9,7 @@ const TrashIcon = () => (
     viewBox="0 0 12 12"
     height="12"
     width="12"
-    fill="#353740"
+    fill="#FFFFFF"
   >
     <path
       fillRule="evenodd"

@@ -47,7 +47,6 @@ const ChatList = forwardRef<unknown, ChatListProps>(
 
     return (
       <div className={styles.chatList}>
-        <h2>Your Chats</h2>
         <ul>
           {chats.map((chat) => (
             <li

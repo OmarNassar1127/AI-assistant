@@ -6,7 +6,7 @@
   width: 100%;
   height: 100%;
   padding: 20px;
-  background-color: #efefef;
+  background-color: #212121;
   overflow: hidden;
   border-radius: 16px;
 }
@@ -16,6 +16,7 @@
   padding: 10px;
   display: flex;
   flex-direction: column;
+  color: white;
   gap: 12px;
   align-items: center;
   width: 100%;
@@ -39,7 +40,7 @@
 }
 .fileStatus {
   font-size: 0.8em;
-  color: #666;
+  color: white;
 }
 
 .fileDeleteIcon {
@@ -54,6 +55,7 @@
 
 .fileUploadBtn {
   background-color: #000;
+  border: 2px solid white;
   color: white;
   padding: 8px 24px;
   border-radius: 32px;
