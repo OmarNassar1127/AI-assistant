@@ -7,6 +7,7 @@
   height: 100%;
   padding: 20px;
   background-color: #212121;
+  border: 1px solid white;
   overflow: hidden;
   border-radius: 16px;
 }
@@ -54,7 +55,7 @@
 }
 
 .fileUploadBtn {
-  background-color: #000;
+  /* background-color: #000; */
   border: 2px solid white;
   color: white;
   padding: 8px 24px;
