@@ -1,8 +1,9 @@
+/* chat-list.module.css */
 .chatList {
   padding: 20px;
   background-color: #171717;
-  height: 84.3%;
-  width: 300px;
+  height: 100%;
+  width: 100%;
 }
 
 .chatList h2 {
