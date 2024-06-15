@@ -73,8 +73,12 @@
 }
 
 .button:disabled {
-  background-color: #5D5D5D;
+  background-color: #2f2f2f;
   cursor: not-allowed;
+}
+
+.activeButton svg circle {
+  fill: white; /* Change to desired active circle color */
 }
 
 

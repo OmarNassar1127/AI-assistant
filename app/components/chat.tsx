@@ -347,12 +347,12 @@ const Chat = ({
           />
           <button
             type="submit"
-            className={styles.button}
+            className={`${styles.button} ${userInput ? styles.activeButton : ""}`}
             disabled={inputDisabled || loading}
           >
             <svg width="35" height="35" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
               <circle cx="12" cy="12" r="12" fill="#5D5D5D"/>
-              <path d="M13 17V11H15L12 8L9 11H11V17H13Z" fill="white"/>
+              <path d="M13 17V11H15L12 8L9 11H11V17H13Z" fill="#2f2f2f"/>
             </svg>
           </button>
         </div>
