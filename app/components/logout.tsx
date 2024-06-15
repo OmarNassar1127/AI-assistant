@@ -7,6 +7,7 @@ const Logout: React.FC = () => {
 
   const handleLogout = () => {
     logout();
+    window.location.href = "/";
   };
 
   return (
