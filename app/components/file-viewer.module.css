@@ -39,6 +39,7 @@
 .fileName {
   flex-grow: 1;
 }
+
 .fileStatus {
   font-size: 0.8em;
   color: white;
@@ -55,7 +56,6 @@
 }
 
 .fileUploadBtn {
-  /* background-color: #000; */
   border: 2px solid white;
   color: white;
   padding: 8px 24px;
