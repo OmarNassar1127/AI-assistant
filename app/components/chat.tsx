@@ -336,24 +336,26 @@ const Chat = ({
         ))}
         <div ref={messagesEndRef} />
       </div>
-      <form
-        onSubmit={handleSubmit}
-        className={`${styles.inputForm} ${styles.clearfix}`}
-      >
-        <input
-          type="text"
-          className={`${styles.input} ${inputDisabled ? styles.loading : ""}`}
-          value={userInput}
-          onChange={(e) => setUserInput(e.target.value)}
-          placeholder="Enter your question"
-        />
-        <button
-          type="submit"
-          className={styles.button}
-          disabled={inputDisabled || loading}
-        >
-          Send
-        </button>
+      <form onSubmit={handleSubmit} className={styles.inputForm}>
+        <div className={styles.inputWrapper}>
+          <input
+            type="text"
+            className={`${styles.input} ${inputDisabled ? styles.loading : ""}`}
+            value={userInput}
+            onChange={(e) => setUserInput(e.target.value)}
+            placeholder="Enter your question"
+          />
+          <button
+            type="submit"
+            className={styles.button}
+            disabled={inputDisabled || loading}
+          >
+            <svg width="35" height="35" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="12" cy="12" r="12" fill="#5D5D5D"/>
+              <path d="M13 17V11H15L12 8L9 11H11V17H13Z" fill="white"/>
+            </svg>
+          </button>
+        </div>
       </form>
     </div>
   );
