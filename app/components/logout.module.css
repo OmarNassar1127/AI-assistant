@@ -1,13 +1,16 @@
-/* components/logout.module.css */
-.logoutButton {
-  padding: 12px 24px;
-  background-color: #000;
-  color: white;
+.logout {
+  padding: 10px 20px;
   border: none;
+  border-radius: 35px;
+  background-color: white;
+  color: black;
   font-size: 1em;
-  border-radius: 12px;
   cursor: pointer;
-  position: absolute;
-  top: 5vh;
-  right: 13vh;
+  margin-top: auto; /* Ensure the logout button is at the bottom of the sidebar */
+}
+
+.logout:hover {
+  background-color: #272727;
+  color: white;
+  border: 2px solid white;
 }

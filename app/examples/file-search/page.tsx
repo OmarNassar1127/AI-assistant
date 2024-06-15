@@ -8,6 +8,7 @@ import FileViewer from "../../components/file-viewer";
 import Login from "../../components/login";
 import ChatList from "../../components/chat-list";
 import CreateChat from "../../components/create-chat";
+import Logout from "../../components/logout";
 
 const FileSearchPage: React.FC = () => {
   const { user } = useAuth();
@@ -40,6 +41,7 @@ const FileSearchPage: React.FC = () => {
         <div className={styles.sidebar}>
           <CreateChat onChatCreated={handleChatCreated} />
           <ChatList onSelectChat={handleChatSelect} ref={chatListRef} activeChatId={selectedChatId} />
+          <Logout />
         </div>
         <div className={styles.content}>
           {selectedChatId ? (
