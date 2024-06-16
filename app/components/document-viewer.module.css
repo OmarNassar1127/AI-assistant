@@ -26,6 +26,11 @@
   box-sizing: border-box;
 }
 
+.highlight {
+  background-color: yellow;
+  font-weight: bold;
+}
+
 @media (max-width: 768px) {
   .docxContainer {
     height: 60vh;

@@ -56,11 +56,13 @@ type ChatProps = {
   functionCallHandler?: (
     toolCall: RequiredActionFunctionToolCall
   ) => Promise<string>;
+  updateHighlightedQuotes: (quotes: string[]) => void;
 };
 
 const Chat = ({
   chatId,
   functionCallHandler = () => Promise.resolve(""),
+  updateHighlightedQuotes,
 }: ChatProps) => {
   const { user } = useAuth();
   const [userInput, setUserInput] = useState("");
@@ -289,6 +291,10 @@ const Chat = ({
       if (event.event === "thread.run.completed") {
         handleRunCompleted();
         saveMessage(question, assistantResponse);
+
+        // Extract and update highlighted quotes here
+        const quotes = extractQuotesFromResponse(assistantResponse);
+        updateHighlightedQuotes(quotes);
       }
     });
   };
@@ -322,6 +328,16 @@ const Chat = ({
       });
       return [...prevMessages.slice(0, -1), updatedLastMessage];
     });
+  };
+
+  const extractQuotesFromResponse = (response: string): string[] => {
+    const quotes = [];
+    const regex = /"([^"]+)"/g;
+    let match;
+    while ((match = regex.exec(response)) !== null) {
+      quotes.push(match[1]);
+    }
+    return quotes;
   };
 
   return (
