@@ -21,13 +21,13 @@
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   margin-top: 10px;
   width: 100%;
-  height: 80vh; /* Adjusted to ensure the container takes most of the viewport */
+  height: 85vh;
   overflow-y: auto;
   box-sizing: border-box;
 }
 
 @media (max-width: 768px) {
   .docxContainer {
-    height: 60vh; /* Adjust height for smaller screens */
+    height: 60vh;
   }
 }
