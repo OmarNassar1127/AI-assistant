@@ -4,12 +4,13 @@
   justify-content: center;
   align-items: center;
   height: 100vh;
-  background-color: white;
+  background-color: #212121;
 }
 .title {
   font-size: 1.5em;
   margin-bottom: 20px;
   font-weight: 600;
+  color: white;
 }
 
 .container {
@@ -22,6 +23,8 @@
   box-sizing: border-box;
   align-items: center;
   justify-content: center;
+    background-color: #212121;
+
 }
 
 .category {
@@ -50,10 +53,11 @@
   text-align: center;
   margin-top: 20px;
   font-size: 0.9em;
+  color: white;
 }
 
 .link {
-  color: blue;
+  color: lightblue;
   cursor: pointer;
   text-decoration: underline;
 }
