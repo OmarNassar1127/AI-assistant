@@ -14,41 +14,69 @@ type DocumentViewerProps = {
 const DocumentViewer: React.FC<DocumentViewerProps> = ({ chatId }) => {
   const [file, setFile] = useState<File | null>(null);
   const [fileType, setFileType] = useState<string | null>(null);
-  const pdfCanvasRef = useRef<HTMLCanvasElement | null>(null);
+  const pdfContainerRef = useRef<HTMLDivElement | null>(null);
   const docxContainerRef = useRef<HTMLDivElement | null>(null);
 
-  const renderPDF = (file: File) => {
+  const renderPDF = async (file: File) => {
     const url = URL.createObjectURL(file);
-    pdfjsLib.getDocument(url).promise.then((pdf) => {
-      pdf.getPage(1).then((page) => {
+    const pdf = await pdfjsLib.getDocument(url).promise;
+    if (pdfContainerRef.current) {
+      pdfContainerRef.current.innerHTML = ''; 
+      for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+        const page = await pdf.getPage(pageNum);
         const scale = 1.5;
         const viewport = page.getViewport({ scale });
-        const canvas = pdfCanvasRef.current;
-        const context = canvas?.getContext("2d");
+
+        const canvas = document.createElement("canvas");
+        const context = canvas.getContext("2d");
         canvas.height = viewport.height;
         canvas.width = viewport.width;
 
-        page.render({
+        await page.render({
           canvasContext: context,
           viewport,
-        });
-      });
-    });
+        }).promise;
+
+        pdfContainerRef.current.appendChild(canvas);
+      }
+    }
   };
 
-  const renderDOCX = (file: File) => {
+  const renderDOCX = async (file: File) => {
     const reader = new FileReader();
-    reader.onload = function (event) {
+    reader.onload = async (event) => {
       const arrayBuffer = event.target?.result;
       if (arrayBuffer instanceof ArrayBuffer) {
-        mammoth.convertToHtml({ arrayBuffer })
-          .then((result) => {
-            const docxContainer = docxContainerRef.current;
-            if (docxContainer) {
-              docxContainer.innerHTML = result.value;
-            }
-          })
-          .catch((err) => console.error(err));
+        const result = await mammoth.convertToHtml({ arrayBuffer }, {
+          styleMap: [
+            "p[style-name='Normal'] => p",
+            "h1 => h1",
+            "h2 => h2",
+            "h3 => h3",
+            "h4 => h4",
+            "h5 => h5",
+            "h6 => h6",
+            "img => img"
+          ],
+          convertImage: mammoth.images.imgElement((image) => {
+            return image.read("base64").then((imageBuffer) => {
+              return {
+                src: `data:${image.contentType};base64,${imageBuffer}`,
+              };
+            });
+          }),
+        });
+        if (docxContainerRef.current) {
+          docxContainerRef.current.innerHTML = result.value;
+          // Ensure images are styled correctly
+          const images = docxContainerRef.current.querySelectorAll('img');
+          images.forEach((img) => {
+            img.style.maxWidth = '100%';
+            img.style.height = 'auto';
+            img.style.display = 'block';
+            img.style.margin = '10px 0';
+          });
+        }
       }
     };
     reader.readAsArrayBuffer(file);
@@ -73,7 +101,7 @@ const DocumentViewer: React.FC<DocumentViewerProps> = ({ chatId }) => {
     <div className={styles.documentViewer}>
       <input type="file" onChange={handleFileChange} />
       {fileType === "application/pdf" && (
-        <canvas ref={pdfCanvasRef} className={styles.pdfCanvas}></canvas>
+        <div ref={pdfContainerRef} className={styles.pdfContainer}></div>
       )}
       {fileType ===
         "application/vnd.openxmlformats-officedocument.wordprocessingml.document" && (

@@ -1,14 +1,17 @@
-/* components/document-viewer.module.css */
 .documentViewer {
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 100%;
+  width: 95%;
+  height: 95%;
+  overflow: hidden;
 }
 
-.pdfCanvas {
+.docxContainer img {
   max-width: 100%;
   height: auto;
+  display: block;
+  margin: 10px 0;
 }
 
 .docxContainer {
@@ -18,4 +21,13 @@
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   margin-top: 10px;
   width: 100%;
+  height: 80vh; /* Adjusted to ensure the container takes most of the viewport */
+  overflow-y: auto;
+  box-sizing: border-box;
+}
+
+@media (max-width: 768px) {
+  .docxContainer {
+    height: 60vh; /* Adjust height for smaller screens */
+  }
 }
