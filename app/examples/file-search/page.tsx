@@ -4,7 +4,7 @@ import { useAuth } from "../../context/AuthContext";
 import styles from "../shared/page.module.css";
 import Chat from "../../components/chat";
 import FileViewer from "../../components/file-viewer";
-import DocumentViewer from "../../components/dcoument-viewer";
+import DocumentViewer from "../../components/document-viewer";
 import Login from "../../components/login";
 import ChatList from "../../components/chat-list";
 import CreateChat from "../../components/create-chat";
