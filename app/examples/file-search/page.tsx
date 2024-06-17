@@ -27,7 +27,6 @@ const FileSearchPage: React.FC = () => {
   };
 
   const updateHighlightedQuotes = (quotes: string[]) => {
-    console.log(quotes);
     setHighlightedQuotes(quotes);
   };
 

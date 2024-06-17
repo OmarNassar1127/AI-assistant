@@ -17,7 +17,7 @@ const DocumentViewer: React.FC<DocumentViewerProps> = ({
   const docxContainerRef = useRef<HTMLDivElement | null>(null);
 
   const escapeRegExp = (string: string) => {
-    return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); // $& means the whole matched string
+    return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); 
   };
 
   useEffect(() => {

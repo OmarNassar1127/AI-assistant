@@ -293,7 +293,6 @@ const Chat = ({
         handleRunCompleted();
         saveMessage(question, assistantResponse);
 
-        // Extract and update highlighted quotes here
         const quotes = extractQuotesFromResponse(assistantResponse);
         updateHighlightedQuotes(quotes);
       }
@@ -332,7 +331,7 @@ const Chat = ({
   };
 
   const escapeRegExp = (string: string) => {
-    return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); // $& means the whole matched string
+    return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); 
   };
 
   const extractQuotesFromResponse = (response: string): string[] => {
