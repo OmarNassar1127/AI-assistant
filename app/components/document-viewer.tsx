@@ -20,7 +20,6 @@ const DocumentViewer: React.FC<DocumentViewerProps> = ({
     if (docxContainerRef.current) {
       const docxContainer = docxContainerRef.current;
       highlightedQuotes.forEach((quote) => {
-        console.log(quote);
         const regex = new RegExp(quote, "g");
         docxContainer.innerHTML = docxContainer.innerHTML.replace(
           regex,
