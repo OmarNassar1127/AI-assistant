@@ -72,6 +72,7 @@ const Chat = ({
   const [loading, setLoading] = useState(false);
 
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
+
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
@@ -330,6 +331,10 @@ const Chat = ({
     });
   };
 
+  const escapeRegExp = (string: string) => {
+    return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); // $& means the whole matched string
+  };
+
   const extractQuotesFromResponse = (response: string): string[] => {
     const quotes = [];
     const regex = /"([^"]+)"/g;
@@ -342,7 +347,7 @@ const Chat = ({
 
   return (
     <div className={styles.chatContainer}>
-      <div className={styles.messages}>
+      <div className={styles.messages} ref={messagesEndRef}>
         {messages.map((msg, index) => (
           <React.Fragment key={index}>
             {msg.question && <Message role="user" text={msg.question} />}

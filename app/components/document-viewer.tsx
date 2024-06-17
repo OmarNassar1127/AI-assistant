@@ -16,11 +16,16 @@ const DocumentViewer: React.FC<DocumentViewerProps> = ({
   const [fileType, setFileType] = useState<string | null>(null);
   const docxContainerRef = useRef<HTMLDivElement | null>(null);
 
+  const escapeRegExp = (string: string) => {
+    return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); // $& means the whole matched string
+  };
+
   useEffect(() => {
     if (docxContainerRef.current) {
       const docxContainer = docxContainerRef.current;
       highlightedQuotes.forEach((quote) => {
-        const regex = new RegExp(quote, "g");
+        const escapedQuote = escapeRegExp(quote);
+        const regex = new RegExp(escapedQuote, "g");
         docxContainer.innerHTML = docxContainer.innerHTML.replace(
           regex,
           `<span class="${styles.highlight}">${quote}</span>`
@@ -67,7 +72,8 @@ const DocumentViewer: React.FC<DocumentViewerProps> = ({
           });
 
           highlightedQuotes.forEach((quote) => {
-            const regex = new RegExp(quote, "g");
+            const escapedQuote = escapeRegExp(quote);
+            const regex = new RegExp(escapedQuote, "g");
             docxContainerRef.current.innerHTML =
               docxContainerRef.current.innerHTML.replace(
                 regex,

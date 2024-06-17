@@ -57,11 +57,17 @@ const FileSearchPage: React.FC = () => {
               </div>
               <div className={styles.chatContainer}>
                 <div className={styles.chat}>
-                  <Chat chatId={selectedChatId} updateHighlightedQuotes={updateHighlightedQuotes} />
+                  <Chat 
+                    chatId={selectedChatId} 
+                    updateHighlightedQuotes={updateHighlightedQuotes} 
+                  />
                 </div>
               </div>
               <div className={styles.documentViewerContainer}>
-                <DocumentViewer chatId={selectedChatId} highlightedQuotes={highlightedQuotes} />
+                <DocumentViewer 
+                  chatId={selectedChatId} 
+                  highlightedQuotes={highlightedQuotes} 
+                />
               </div>
             </>
           ) : (
