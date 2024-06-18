@@ -22,7 +22,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         <AuthProvider>
           <RootLayout>
             {assistantId ? children : <Warnings />}
-            <img className="logo" src="/omar.png" alt="OpenAI Logo" />
+            {/* <img className="logo" src="/omar.png" alt="OpenAI Logo" /> */}
           </RootLayout>
         </AuthProvider>
       </body>

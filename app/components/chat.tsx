@@ -56,11 +56,13 @@ type ChatProps = {
   functionCallHandler?: (
     toolCall: RequiredActionFunctionToolCall
   ) => Promise<string>;
+  updateHighlightedQuotes: (quotes: string[]) => void;
 };
 
 const Chat = ({
   chatId,
   functionCallHandler = () => Promise.resolve(""),
+  updateHighlightedQuotes,
 }: ChatProps) => {
   const { user } = useAuth();
   const [userInput, setUserInput] = useState("");
@@ -70,6 +72,7 @@ const Chat = ({
   const [loading, setLoading] = useState(false);
 
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
+
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
@@ -289,6 +292,9 @@ const Chat = ({
       if (event.event === "thread.run.completed") {
         handleRunCompleted();
         saveMessage(question, assistantResponse);
+
+        const quotes = extractQuotesFromResponse(assistantResponse);
+        updateHighlightedQuotes(quotes);
       }
     });
   };
@@ -324,9 +330,23 @@ const Chat = ({
     });
   };
 
+  const escapeRegExp = (string: string) => {
+    return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); 
+  };
+
+  const extractQuotesFromResponse = (response: string): string[] => {
+    const quotes = [];
+    const regex = /"([^"]+)"/g;
+    let match;
+    while ((match = regex.exec(response)) !== null) {
+      quotes.push(match[1]);
+    }
+    return quotes;
+  };
+
   return (
     <div className={styles.chatContainer}>
-      <div className={styles.messages}>
+      <div className={styles.messages} ref={messagesEndRef}>
         {messages.map((msg, index) => (
           <React.Fragment key={index}>
             {msg.question && <Message role="user" text={msg.question} />}

@@ -1,0 +1,38 @@
+.documentViewer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 95%;
+  height: 95%;
+  overflow: hidden;
+}
+
+.docxContainer img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 10px 0;
+}
+
+.docxContainer {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  margin-top: 10px;
+  width: 100%;
+  height: 85vh;
+  overflow-y: auto;
+  box-sizing: border-box;
+}
+
+.highlight {
+  background-color: yellow;
+  font-weight: bold;
+}
+
+@media (max-width: 768px) {
+  .docxContainer {
+    height: 60vh;
+  }
+}

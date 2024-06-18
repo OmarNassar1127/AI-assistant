@@ -1,10 +1,10 @@
 "use client";
-
 import React, { useState, useRef } from "react";
 import { useAuth } from "../../context/AuthContext";
 import styles from "../shared/page.module.css";
 import Chat from "../../components/chat";
 import FileViewer from "../../components/file-viewer";
+import DocumentViewer from "../../components/document-viewer";
 import Login from "../../components/login";
 import ChatList from "../../components/chat-list";
 import CreateChat from "../../components/create-chat";
@@ -14,6 +14,7 @@ const FileSearchPage: React.FC = () => {
   const { user } = useAuth();
   const [selectedChatId, setSelectedChatId] = useState<number | null>(null);
   const chatListRef = useRef<{ fetchChats: () => void }>(null);
+  const [highlightedQuotes, setHighlightedQuotes] = useState<string[]>([]);
 
   const handleChatSelect = (chatId: number) => {
     setSelectedChatId(chatId);
@@ -23,6 +24,10 @@ const FileSearchPage: React.FC = () => {
     if (chatListRef.current) {
       chatListRef.current.fetchChats();
     }
+  };
+
+  const updateHighlightedQuotes = (quotes: string[]) => {
+    setHighlightedQuotes(quotes);
   };
 
   if (!user) {
@@ -51,8 +56,17 @@ const FileSearchPage: React.FC = () => {
               </div>
               <div className={styles.chatContainer}>
                 <div className={styles.chat}>
-                  <Chat chatId={selectedChatId} />
+                  <Chat 
+                    chatId={selectedChatId} 
+                    updateHighlightedQuotes={updateHighlightedQuotes} 
+                  />
                 </div>
+              </div>
+              <div className={styles.documentViewerContainer}>
+                <DocumentViewer 
+                  chatId={selectedChatId} 
+                  highlightedQuotes={highlightedQuotes} 
+                />
               </div>
             </>
           ) : (
