@@ -1,10 +1,11 @@
 "use client";
 
 import React, { useState } from "react";
-import { useAuth } from "./context/AuthContext";
-import styles from "./page.module.css";
 import Login from "./components/login";
 import Register from "./components/register";
+import { BackgroundBeams } from "./components/ui/background-beams";
+import { useAuth } from "./context/AuthContext";
+import styles from "./page.module.css";
 
 const Home: React.FC = () => {
   const { user } = useAuth();
@@ -31,6 +32,7 @@ const Home: React.FC = () => {
 
   return (
     <main className={styles.main}>
+      <BackgroundBeams />
       <div className={styles.title}>Chat with your files</div>
       {showRegister ? (
         <>

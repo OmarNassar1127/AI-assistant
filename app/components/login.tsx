@@ -1,4 +1,5 @@
 // components/Login.tsx
+import { Button, Input } from "@nextui-org/react";
 import React, { useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import styles from "./login.module.css";
@@ -26,27 +27,29 @@ const Login: React.FC = () => {
   };
 
   return (
-    <div className={styles.loginContainer}>
+    <div className="">
       <form onSubmit={handleSubmit} className={styles.loginForm}>
-        <input
+        <Input
           type="text"
-          placeholder="Username"
+          variant="underlined"
+          label="Username"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
           required
-          className={styles.input}
         />
-        <input
+        <Input
           type="password"
-          placeholder="Password"
+          variant="underlined"
+          label="Password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
-          className={styles.input}
         />
-        <button type="submit" className={styles.button}>
+
+        <Button variant="solid" type="submit">
           Login
-        </button>
+        </Button>
+
         {error && <p className={styles.error}>{error}</p>}
       </form>
     </div>

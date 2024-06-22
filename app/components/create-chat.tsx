@@ -1,4 +1,5 @@
 // components/CreateChat.tsx
+import { Button } from "@nextui-org/react";
 import React, { useState } from "react";
 import styles from "./create-chat.module.css";
 
@@ -43,6 +44,7 @@ const CreateChat: React.FC<{ onChatCreated: () => void }> = ({
         />
         <button type="submit">Create Chat</button>
       </form>
+      <Button variant="solid">Click me</Button>
     </div>
   );
 };
